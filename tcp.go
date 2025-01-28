@@ -1,11 +1,10 @@
 package main
 
 import (
+	"github.com/libp2p/go-reuseport"
 	"io"
 	"log"
 	"net"
-
-	"github.com/libp2p/go-reuseport"
 )
 
 func tcpForward(protocol string, from string, to string) {

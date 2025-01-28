@@ -1,12 +1,10 @@
 package main
 
 import (
+	"gopkg.in/yaml.v3"
+	"log"
 	"os"
 	"os/signal"
-
-	"log"
-
-	"gopkg.in/yaml.v3"
 )
 
 var (

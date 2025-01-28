@@ -24,3 +24,5 @@ go.work
 
 config.yaml
 portfwd
+/portfwd_linux_amd64
+/portfwd_darwin_amd64
