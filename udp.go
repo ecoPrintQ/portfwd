@@ -34,15 +34,15 @@ func udpForward(forward ForwardStruct) {
 			log.Printf("Error reading from UDP socket: %v\n", err)
 		}
 		//log.Printf(fmt.Sprintf("%v", buf))
-		log.Printf(fmt.Sprintf("Paquete recibido de %v: %s\n", addr, string(buf[:n])))
+		log.Printf(fmt.Sprintf("Package received from %v: %s\n", addr, string(buf[:n])))
 
 		_, err = dst.Write(buf[:n])
 		if err != nil {
-			log.Printf("Error al reenviar el paquete: %v", err)
+			log.Printf("Failed to resend packet: %v", err)
 			continue
 		}
 
-		fmt.Printf("Paquete reenviado a %v\n", dstAddr)
+		fmt.Printf("Package forwarded to  %v\n", dstAddr)
 
 		// Esperar la respuesta del remoteAddr
 		// Leemos la respuesta del remoteConn (la cual puede ser un paquete UDP enviado de vuelta)
@@ -50,21 +50,21 @@ func udpForward(forward ForwardStruct) {
 		dst.SetReadDeadline(time.Now().Add(5 * time.Second)) // Timeout de 5 segundos
 		n, err = dst.Read(buf)
 		if err != nil {
-			log.Printf("Error al recibir respuesta del remoteAddr: %v", err)
+			log.Printf("Error receiving response from remoteAddr: %v", err)
 			continue
 		}
 
 		// Mostrar la respuesta recibida del remoteAddr
-		fmt.Printf("Respuesta recibida de %v: %s\n", dstAddr, string(buf[:n]))
+		fmt.Printf("Response received from %v: %s\n", dstAddr, string(buf[:n]))
 
 		// Reenviar la respuesta al cliente original
 		_, err = src.WriteTo(buf[:n], addr)
 		if err != nil {
-			log.Printf("Error al reenviar la respuesta al cliente: %v", err)
+			log.Printf("Error when resending the response to the customer: %v", err)
 			continue
 		}
 
-		fmt.Printf("Respuesta reenviada al cliente %v\n", addr)
+		fmt.Printf("Response forwarded to customer %v\n", addr)
 
 	}
 }
