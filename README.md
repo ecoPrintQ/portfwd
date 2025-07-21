@@ -67,6 +67,7 @@ Then you can run the program:
 ```
 ./portfwd
 ```
+** If PORTFWD_CONFIG_FILE_PATH is not found, it will search for config.yaml in the same execution path.
 
 ### As a systemd service
 
