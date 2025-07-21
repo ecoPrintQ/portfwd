@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	version   string
-	buildTime string
+	version   string = "1.0.0-alpha"
+	buildTime string = "2025-07-21"
 	forward   ForwardStruct
 	config    ConfigStruct
 )
@@ -27,6 +27,10 @@ type ConfigStruct struct {
 func main() {
 	log.Printf("Starting portfwd %s build on %s", version, buildTime)
 	configFilePath := os.Getenv("PORTFWD_CONFIG_FILE_PATH")
+	if configFilePath == "" {
+		configFilePath = "config.yaml"
+		log.Printf("PORTFWD_CONFIG_FILE_PATH not defined. Use default configuration file. (config.yaml)")
+	}
 	log.Printf("Loading configuration file located at %s", configFilePath)
 	configFile, err := os.ReadFile(configFilePath)
 	if err != nil {

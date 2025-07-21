@@ -11,23 +11,25 @@ import (
 func udpForward(forward ForwardStruct) {
 	src, err := reuseport.ListenPacket(forward.Protocol, forward.From)
 	if err != nil {
-		log.Printf("The connection failed (ListenPacket): %v", err)
+		log.Printf("Error. The connection failed (ListenPacket): %v", err)
+		return
 	}
 	defer src.Close()
 
 	dstAddr, err := net.ResolveUDPAddr(forward.Protocol, forward.To[0])
 	if err != nil {
 		log.Printf("Error resolving destination address: %v\n", err)
+		return
 	}
 
 	dst, err := net.DialUDP(forward.Protocol, nil, dstAddr)
 	if err != nil {
-		log.Printf("The connection failed (DialUDP): %v", err)
+		log.Printf("Error. The connection failed (DialUDP): %v", err)
+		return
 	}
 	defer dst.Close()
 
 	for {
-		log.Printf("For...")
 		buf := make([]byte, 2048)
 		n, addr, err := src.ReadFrom(buf)
 		if err != nil {
