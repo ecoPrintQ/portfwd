@@ -1,44 +1,46 @@
 package main
 
 import (
+	"fmt"
 	"github.com/libp2p/go-reuseport"
 	"io"
-	"log"
 	"net"
 )
 
-func tcpForward(protocol string, from string, to string) {
-	listener, err := reuseport.Listen(protocol, to)
-
-	if err != nil {
-		log.Printf("The connection failed: %v", err)
-	}
-
-	for {
-		conn, err := listener.Accept()
-
+func tcpForward(protocol string, from string, to string) func() error {
+	return func() error {
+		listener, err := reuseport.Listen(protocol, to)
 		if err != nil {
-			log.Printf("The connection was not accepted: %v", err)
+			errF := fmt.Errorf("The connection failed: %v", err)
+			return errF
 		}
+		defer listener.Close()
 
-		client, err := net.Dial(protocol, from)
+		for {
+			conn, err := listener.Accept()
+			if err != nil {
+				errF := fmt.Errorf("The connection was not accepted: %v", err)
+				return errF
+			}
 
-		if err != nil {
-			log.Printf("The connection failed: %v", err)
-			conn.Close()
-			continue
+			client, err := net.Dial(protocol, from)
+			if err != nil {
+				conn.Close()
+				errF := fmt.Errorf("The connection failed: %v", err)
+				return errF
+			}
+
+			go func() {
+				defer client.Close()
+				defer conn.Close()
+				io.Copy(client, conn)
+			}()
+
+			go func() {
+				defer client.Close()
+				defer conn.Close()
+				io.Copy(conn, client)
+			}()
 		}
-
-		go func() {
-			defer client.Close()
-			defer conn.Close()
-			io.Copy(client, conn)
-		}()
-
-		go func() {
-			defer client.Close()
-			defer conn.Close()
-			io.Copy(conn, client)
-		}()
 	}
 }
